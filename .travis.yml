@@ -1,0 +1,31 @@
+script:
+  - docker run -e CI=true USERNAME/react-test npm test
+
+sudo: required
+  # specify docker as dep
+services:
+  - docker
+
+before_install: 
+  # build test version
+  - docker build -t ecommarato/react-test -f ./client/Dockerfile.dev ./client
+
+# run tests
+script:
+  # --coverage makes sure the tests exit with status code
+  - docker run ecommarato/react-test npm test -- --coverage
+  
+# build prod
+after_success:
+  - docker build -t ecommarato/multi-client ./client
+  - docker build -t ecommarato/multi-nginx ./nginx
+  - docker build -t ecommarato/multi-server ./server
+  - docker build -t ecommarato/multi-worker ./worker
+  # log into docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # push images to docker hub
+  - docker push ecommarato/multi-client
+  - docker push ecommarato/multi-nginx
+  - docker push ecommarato/multi-server
+  - docker push ecommarato/multi-worker
+  # tell EB to update
