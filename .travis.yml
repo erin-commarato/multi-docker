@@ -21,7 +21,7 @@ after_success:
   - docker push ecommarato/multi-client
   - docker push ecommarato/multi-nginx
   - docker push ecommarato/multi-server
-  - docker push ecommarato/multi-worker
+  - docker push ecommarato/multi-worker 
 
 deploy:
   provider: elasticbeanstalk
